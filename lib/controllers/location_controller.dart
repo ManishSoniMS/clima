@@ -1,6 +1,6 @@
-import 'dart:developer';
 
-import 'package:clima/providers/location_provider.dart';
+
+import '/providers/location_provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,18 +21,26 @@ class LocationController extends _$LocationController {
 
   Position? get position => _position;
 
-  Future<void> getLocation() async {
-    log('Location: get location method called');
+  Future<void> checkLocationPermission() async {
     state = AsyncLoading();
     try {
-      // state = await AsyncValue<Position>.data(() async {
+      state = await AsyncValue.guard(() async {
+        final dataRepository = ref.read(locationRepositoryProvider);
+        await dataRepository.checkPermission();
+      });
+    } catch (e) {
+      state = AsyncError(e.toString(), StackTrace.current);
+    }
+  }
+
+  Future<void> getCurrentLocation() async {
+    state = AsyncLoading();
+    try {
       final dataRepository = ref.read(locationRepositoryProvider);
       final location = await dataRepository.getCurrentLocation();
-      log('Location: ${location.latitude}, ${location.longitude}');
-      // });
+
       state = AsyncValue<Position>.data(location);
     } catch (e) {
-      log('Location: Error : $e');
       state = AsyncError(e.toString(), StackTrace.current);
     }
   }

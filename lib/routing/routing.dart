@@ -1,7 +1,7 @@
-import 'package:clima/controllers/location_controller.dart';
-import 'package:clima/screen/loading_screen.dart';
-import 'package:clima/screen/location_screen.dart';
-import 'package:clima/screen/no_permission_screen.dart';
+import '/controllers/location_controller.dart';
+import '/screen/loading_screen.dart';
+import '/screen/location_screen.dart';
+import '/screen/no_permission_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,6 +14,9 @@ GoRouter goRouter(Ref ref) {
   GoRouter _router = GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
+      if (locationController.hasValue) {
+        return '/location';
+      }
       if (locationController.hasError) {
         return '/no-permission';
       }

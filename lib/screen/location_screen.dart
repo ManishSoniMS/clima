@@ -1,27 +1,35 @@
+import 'dart:developer';
+
+import 'package:clima_a_weather_app/controllers/location_controller.dart';
+import 'package:clima_a_weather_app/providers/location_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants.dart';
 import '../services/weather.dart';
 import 'city_screen.dart';
 
-class LocationScreen extends StatefulWidget {
-  // final locationWeather;
-  // LocationScreen({this.locationWeather});
+class LocationScreen extends ConsumerStatefulWidget {
   @override
-  _LocationScreenState createState() => _LocationScreenState();
+  ConsumerState createState() => _LocationScreenState();
 }
 
-class _LocationScreenState extends State<LocationScreen> {
+class _LocationScreenState extends ConsumerState<LocationScreen> {
   WeatherModel weather = WeatherModel();
-  late int temperature;
-  late String weatherIcon;
-  late String weatherMessage;
-  late String cityName;
+  int temperature = 0;
+  String weatherIcon = '', weatherMessage = '', cityName = '';
 
   @override
   void initState() {
     super.initState();
-    updateUI(null);
+
+    hitApi();
+  }
+
+  Future<void> hitApi() async {
+    WeatherModel weatherModel = WeatherModel();
+    final res = await weatherModel.getLocationWeather();
+    updateUI(res);
   }
 
   void updateUI(dynamic weatherAPIData) {

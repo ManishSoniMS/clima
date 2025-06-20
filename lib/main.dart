@@ -1,5 +1,5 @@
-import 'package:clima/controllers/location_controller.dart';
-import 'package:clima/routing/routing.dart';
+import '/controllers/location_controller.dart';
+import '/routing/routing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,8 +22,8 @@ class _ClimaState extends ConsumerState<Clima> {
   }
 
   void getLocation() {
-    Future.delayed(Duration(milliseconds: 500)).then((_) {
-      ref.read(locationControllerProvider.notifier).getLocation();
+    Future.delayed(Duration(milliseconds: 1000)).then((_) {
+      ref.read(locationControllerProvider.notifier).checkLocationPermission();
     });
   }
 

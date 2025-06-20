@@ -14,15 +14,16 @@ class Location {
     }
     if (permission == LocationPermission.deniedForever) {
       print(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
   }
-
 
   Future<void> getCurrentLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.low);
+        desiredAccuracy: LocationAccuracy.low,
+      );
       lat = position.latitude;
       long = position.longitude;
       print(position);
