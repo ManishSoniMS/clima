@@ -1,45 +1,59 @@
-import 'package:flutter/material.dart';
-// ignore: import_of_legacy_library_into_null_safe
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:clima_a_weather_app/services/weather.dart';
-import 'package:clima_a_weather_app/screen/location_screen.dart';
+import 'dart:developer';
 
-class LoadingScreen extends StatefulWidget {
+import 'package:clima/controllers/location_controller.dart';
+import 'package:clima/providers/location_provider.dart';
+import 'package:clima/screen/no_permission_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+import '../services/weather.dart';
+import 'location_screen.dart';
+
+class LoadingScreen extends ConsumerStatefulWidget {
+  const LoadingScreen({super.key});
+
   @override
-  _LoadingScreenState createState() => _LoadingScreenState();
+  ConsumerState createState() => _LoadingScreenState();
 }
 
-class _LoadingScreenState extends State<LoadingScreen> {
+class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   @override
-  void initState() {
-    super.initState();
-    getLocationData();
+  void didChangeDependencies() {
+    // ref.watch(locationControllerProvider.notifier).getLocation();
+
+    super.didChangeDependencies();
   }
 
-  void getLocationData() async {
-    WeatherModel weather = WeatherModel();
-    var weatherData = await weather.getLocationWeather();
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return LocationScreen(
-            locationWeather: weatherData,
-          );
+  void listenDataController(WidgetRef ref) {
+    ref.listen(locationControllerProvider, (previous, current) {
+      current.mapOrNull(
+        loading: (_) {
+          log('Loading: Loading state');
         },
-      ),
-    );
+        data: (data){
+          log('Loading: Loaded state : ${data}');
+        },
+        // => Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => LocationScreen()),
+        // ),
+        error: (error) {
+          log('');
+        },
+        // => Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => NoPermissionScreen()),
+        // ),
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // listenDataController(ref);
     return Scaffold(
-      body: Center(
-        child: SpinKitDoubleBounce(
-          color: Colors.white,
-          size: 50.0,
-        ),
-      ),
+      body: Center(child: SpinKitDoubleBounce(color: Colors.white, size: 50.0)),
     );
   }
 }

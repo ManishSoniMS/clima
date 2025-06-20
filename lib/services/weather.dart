@@ -1,5 +1,6 @@
-import 'package:clima_a_weather_app/services/location.dart';
-import 'package:clima_a_weather_app/services/networking.dart';
+
+import 'location.dart';
+import 'networking.dart';
 
 String apiID = '58c4702650a20d64c52d4127718ab1d0';
 String weatherURL = 'https://api.openweathermap.org/data/2.5/weather';

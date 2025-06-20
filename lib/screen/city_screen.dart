@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:clima_a_weather_app/constants.dart';
+
+import '../constants.dart';
 
 class CityScreen extends StatefulWidget {
   @override
@@ -30,9 +30,8 @@ class _CityScreenState extends State<CityScreen> {
               Container(
                 height: mediaQueryHeight * 0.10,
                 alignment: Alignment.topLeft,
-                // ignore: deprecated_member_use
                 child: FittedBox(
-                  child: FlatButton(
+                  child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -73,12 +72,10 @@ class _CityScreenState extends State<CityScreen> {
                   },
                 ),
               ),
-              // ignore: deprecated_member_use
               Container(
                 height: mediaQueryHeight * 0.06,
                 child: FittedBox(
-                  // ignore: deprecated_member_use
-                  child: FlatButton(
+                  child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context, cityName);
                     },

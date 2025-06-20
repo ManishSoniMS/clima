@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:clima_a_weather_app/constants.dart';
-import 'package:clima_a_weather_app/screen/city_screen.dart';
-import 'package:clima_a_weather_app/services/weather.dart';
+
+import '../constants.dart';
+import '../services/weather.dart';
+import 'city_screen.dart';
 
 class LocationScreen extends StatefulWidget {
-  final locationWeather;
-  LocationScreen({this.locationWeather});
+  // final locationWeather;
+  // LocationScreen({this.locationWeather});
   @override
   _LocationScreenState createState() => _LocationScreenState();
 }
@@ -20,7 +21,7 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   void initState() {
     super.initState();
-    updateUI(widget.locationWeather);
+    updateUI(null);
   }
 
   void updateUI(dynamic weatherAPIData) {
@@ -66,21 +67,16 @@ class _LocationScreenState extends State<LocationScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     FittedBox(
-                      // ignore: deprecated_member_use
-                      child: FlatButton(
+                      child: ElevatedButton(
                         onPressed: () async {
                           var weatherData = weather.getLocationWeather();
                           updateUI(weatherData);
                         },
-                        child: Icon(
-                          Icons.near_me,
-                          size: 50.0,
-                        ),
+                        child: Icon(Icons.near_me, size: 50.0),
                       ),
                     ),
                     FittedBox(
-                      // ignore: deprecated_member_use
-                      child: FlatButton(
+                      child: ElevatedButton(
                         onPressed: () async {
                           var typedName = await Navigator.push(
                             context,
@@ -91,14 +87,12 @@ class _LocationScreenState extends State<LocationScreen> {
                             ),
                           );
                           if (typedName != null) {}
-                          var weatherData =
-                              await weather.getCityWeather(typedName);
+                          var weatherData = await weather.getCityWeather(
+                            typedName,
+                          );
                           updateUI(weatherData);
                         },
-                        child: Icon(
-                          Icons.location_city,
-                          size: 50.0,
-                        ),
+                        child: Icon(Icons.location_city, size: 50.0),
                       ),
                     ),
                   ],
@@ -116,11 +110,8 @@ class _LocationScreenState extends State<LocationScreen> {
                       ),
                     ),
                     FittedBox(
-                      child: Text(
-                        '$weatherIcon',
-                        style: kConditionTextStyle,
-                      ),
-                    )
+                      child: Text('$weatherIcon', style: kConditionTextStyle),
+                    ),
                   ],
                 ),
               ),
