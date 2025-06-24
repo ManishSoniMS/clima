@@ -35,7 +35,9 @@ class NoPermissionScreen extends ConsumerWidget {
                   AppSettings.openAppSettings(
                     type: AppSettingsType.location,
                   ).then((_) {
-                    ref.read(locationControllerProvider.notifier).checkLocationPermission();
+                    ref
+                        .read(locationControllerProvider.notifier)
+                        .checkLocationPermission();
                   });
                 },
                 child: Text("Allow Location Permission"),

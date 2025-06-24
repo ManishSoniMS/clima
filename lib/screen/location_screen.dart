@@ -1,7 +1,3 @@
-import 'dart:developer';
-
-import 'package:clima_a_weather_app/controllers/location_controller.dart';
-import 'package:clima_a_weather_app/providers/location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
