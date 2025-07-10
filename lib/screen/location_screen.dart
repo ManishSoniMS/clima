@@ -2,57 +2,59 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants.dart';
-import '../services/weather.dart';
-import 'city_screen.dart';
+import '../controllers/data_controller.dart';
+import '../controllers/location_controller.dart';
+import '../gen/assets.gen.dart';
 
 class LocationScreen extends ConsumerStatefulWidget {
   @override
-  ConsumerState createState() => _LocationScreenState();
+  ConsumerState<LocationScreen> createState() => _LocationScreenState();
 }
 
 class _LocationScreenState extends ConsumerState<LocationScreen> {
-  WeatherModel weather = WeatherModel();
-  int temperature = 0;
-  String weatherIcon = '', weatherMessage = '', cityName = '';
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-
-    hitApi();
+    print("init  is called !");
+    if (!_isInitialized) {
+      _isInitialized = true;
+      Future.delayed(Duration(milliseconds: 300), () => setUp());
+    }
   }
 
-  Future<void> hitApi() async {
-    WeatherModel weatherModel = WeatherModel();
-    final res = await weatherModel.getLocationWeather();
-    updateUI(res);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print("didChangeDependencies  is called !");
   }
 
-  void updateUI(dynamic weatherAPIData) {
-    setState(() {
-      if (weatherAPIData == null) {
-        temperature = 0;
-        weatherIcon = 'Error';
-        weatherMessage = 'Unable to get weather data';
-        cityName = '';
-        return;
-      }
-      temperature = weatherAPIData["main"]["temp"].toInt();
-      int condition = weatherAPIData["weather"][0]["id"];
-      weatherIcon = weather.getWeatherIcon(condition);
-      weatherMessage = weather.getMessage(temperature);
-      cityName = weatherAPIData["name"];
-    });
+  Future<void> setUp() async {
+    final locationNotifier = ref.read(locationControllerProvider.notifier);
+    await locationNotifier.getCurrentLocation();
+
+    final position = locationNotifier.position;
+
+    if (position != null) {
+      await ref
+          .read(dataControllerProvider.notifier)
+          .getWeather(position.latitude, position.longitude);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final mediaQueryHeight = MediaQuery.of(context).size.height;
+    final height = MediaQuery.sizeOf(context).height;
+
+    final dataController = ref.watch(dataControllerProvider.notifier);
+    final locationNotifier = ref.read(locationControllerProvider.notifier);
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('images/location_background.jpg'),
+            image: AssetImage(Assets.images.locationBackground.path),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.white.withOpacity(0.6),
@@ -60,90 +62,90 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
             ),
           ),
         ),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                height: mediaQueryHeight * 0.10,
-                child: Row(
+        child: ref
+            .watch(dataControllerProvider)
+            .when(
+              data: (_) => SafeArea(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    FittedBox(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          var weatherData = weather.getLocationWeather();
-                          updateUI(weatherData);
-                        },
-                        child: Icon(Icons.near_me, size: 50.0),
+                    Container(
+                      height: height * 0.10,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              // await locationNotifier.getCurrentLocation();
+                              // final pos = locationNotifier.position;
+                              // if (pos != null) {
+                              //   await ref
+                              //       .read(dataControllerProvider.notifier)
+                              //       .getWeather(pos.latitude, pos.longitude);
+                              // }
+                            },
+                            child: Icon(Icons.near_me, size: 40),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // TODO: Navigate to CityScreen and get weather by city name
+                            },
+                            child: Icon(Icons.location_city, size: 40),
+                          ),
+                        ],
                       ),
                     ),
-                    FittedBox(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          var typedName = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return CityScreen();
-                              },
-                            ),
-                          );
-                          if (typedName != null) {}
-                          var weatherData = await weather.getCityWeather(
-                            typedName,
-                          );
-                          updateUI(weatherData);
-                        },
-                        child: Icon(Icons.location_city, size: 50.0),
+                    Container(
+                      height: height * 0.2,
+                      padding: const EdgeInsets.all(15.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${dataController.weather.main.temp}°',
+                            style: kTemperatureTextStyle,
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            dataController.getWeatherIcon,
+                            style: kConditionTextStyle,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      height: height * 0.3,
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            dataController.getMessage,
+                            style: kMessageTextStyle,
+                            textAlign: TextAlign.right,
+                          ),
+                          Text(
+                            ' in ${dataController.weather.name}!',
+                            style: kMessageTextStyle,
+                            textAlign: TextAlign.right,
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(
-                height: mediaQueryHeight * 0.2,
-                padding: const EdgeInsets.all(15.0),
-                child: Row(
-                  children: [
-                    FittedBox(
-                      child: Text(
-                        '$temperature° ',
-                        style: kTemperatureTextStyle,
-                      ),
-                    ),
-                    FittedBox(
-                      child: Text('$weatherIcon', style: kConditionTextStyle),
-                    ),
-                  ],
+              error: (error, _) => Center(
+                child: Text(
+                  'Error: $error',
+                  style: TextStyle(color: Colors.red, fontSize: 20),
                 ),
               ),
-              Container(
-                height: mediaQueryHeight * 0.30,
-                padding: const EdgeInsets.all(15.0),
-                child: FittedBox(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "$weatherMessage",
-                        style: kMessageTextStyle,
-                        textAlign: TextAlign.right,
-                      ),
-                      Text(
-                        " in $cityName!",
-                        style: kMessageTextStyle,
-                        textAlign: TextAlign.right,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+              loading: () => Center(child: CircularProgressIndicator()),
+            ),
       ),
     );
   }

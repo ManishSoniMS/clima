@@ -36,7 +36,7 @@ class LocationController extends _$LocationController {
     try {
       final dataRepository = ref.read(locationRepositoryProvider);
       final location = await dataRepository.getCurrentLocation();
-
+      setPosition = location;
       state = AsyncValue<Position>.data(location);
     } catch (e) {
       state = AsyncError(e.toString(), StackTrace.current);

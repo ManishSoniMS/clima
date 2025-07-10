@@ -11,6 +11,8 @@ part 'routing.g.dart';
 @Riverpod(keepAlive: true)
 GoRouter goRouter(Ref ref) {
   final locationController = ref.watch(locationControllerProvider);
+
+  print("location is rebuilding ");
   GoRouter _router = GoRouter(
     initialLocation: '/',
     redirect: (context, state) {

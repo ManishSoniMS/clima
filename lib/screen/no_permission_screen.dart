@@ -1,5 +1,5 @@
 import 'package:app_settings/app_settings.dart';
-import '/utils/extensions/on_buildcontext.dart';
+import '/utils/extensions/on_build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
